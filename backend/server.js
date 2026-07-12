@@ -4,47 +4,26 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+
+// Production CORS Configuration: Restricts access to your frontend environments
 app.use(cors({
-  origin: 'https://internship-at-elevanceskill-project.vercel.app', // Aapka frontend URL
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+    origin: [
+        'http://localhost:5173',
+        'https://internship-at-elevanceskill-project1.vercel.app'
+    ],
+    credentials: true
 }));
+
 app.use(express.json());
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-// Authentication Verification Middleware
-async function requireAuth(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Authorization credentials absent." });
-
-    const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) return res.status(401).json({ error: "Session authentication expired." });
-    
-    req.user = user;
-    next();
-}
-
-// Signup Proxy
-app.post('/api/auth/signup', async (req, res) => {
-    const { email, password } = req.body;
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return res.status(400).json({ error: error.message });
-    res.status(201).json({ session: data.session, user: data.user });
+// Health Check Route to prevent spin-up latency and confirm operational status
+app.get('/api/health', (req, res) => {
+    res.status(200).json({ status: "healthy", timestamp: new Date() });
 });
 
-// Signin Proxy
-app.post('/api/auth/signin', async (req, res) => {
-    const { email, password } = req.body;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return res.status(400).json({ error: error.message });
-    res.json({ session: data.session, user: data.user });
-});
-
-// Fetch Stream Elements (Faster due to index setup)
+// Fetch Stream Elements
 app.get('/api/comments', async (req, res) => {
     const { data, error } = await supabase
         .from('comments')
@@ -55,9 +34,9 @@ app.get('/api/comments', async (req, res) => {
     res.json(data);
 });
 
-// Submit Structured Record
-app.post('/api/comments', requireAuth, async (req, res) => {
-    const { content, detected_language } = req.body;
+// Submit Structured Record (Authentication Removed)
+app.post('/api/comments', async (req, res) => {
+    const { content, detected_language, username } = req.body;
 
     const dangerousPattern = /[<>{}\[\]\\\/]/;
     if (dangerousPattern.test(content)) {
@@ -67,11 +46,13 @@ app.post('/api/comments', requireAuth, async (req, res) => {
     const mockCities = ["San Francisco", "London", "Tokyo", "Berlin", "Paris", "New Delhi"];
     const randomCity = mockCities[Math.floor(Math.random() * mockCities.length)];
 
+    // Fallback username if none is passed from the frontend
+    const finalUsername = username || "anonymous";
+
     const { data, error } = await supabase
         .from('comments')
         .insert([{
-            user_id: req.user.id,
-            username: req.user.email.split('@')[0],
+            username: finalUsername,
             content,
             detected_language,
             city_name: randomCity
@@ -82,17 +63,20 @@ app.post('/api/comments', requireAuth, async (req, res) => {
     res.status(201).json(data[0]);
 });
 
-// UPGRADED: High-Speed Interaction Vote Execution Engine
-app.post('/api/comments/:id/vote', requireAuth, async (req, res) => {
+// High-Speed Interaction Vote Execution Engine (Authentication Removed)
+app.post('/api/comments/:id/vote', async (req, res) => {
     const commentId = req.params.id;
-    const { type } = req.body; // 'like' or 'dislike'
+    const { type, ip_address } = req.body; // 'like' or 'dislike'
     const columnTarget = type === 'like' ? 'likes' : 'dislikes';
 
     try {
+        // Fallback tracking identifier since user_id is no longer present
+        const voteTracker = ip_address || `anon-${Math.random().toString(36).substr(2, 9)}`;
+
         // 1. Log unique vote log instantly. Fails immediately if they already voted.
         const { error: voteError } = await supabase
             .from('comment_votes')
-            .insert([{ user_id: req.user.id, comment_id: commentId, vote_type: type }]);
+            .insert([{ user_id: voteTracker, comment_id: commentId, vote_type: type }]);
 
         if (voteError) {
             return res.status(400).json({ error: "You have already voted on this comment." });
