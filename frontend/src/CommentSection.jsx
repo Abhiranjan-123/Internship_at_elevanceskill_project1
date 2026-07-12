@@ -30,7 +30,7 @@ export default function CommentSection() {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`${API_BASE}/comments`);
+      const res = await fetch(`${API_BASE}/api/comments`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setComments(data);
@@ -57,7 +57,7 @@ export default function CommentSection() {
     if (error || !newComment.trim()) return;
 
     try {
-      const response = await fetch(`${API_BASE}/comments`, {
+      const response = await fetch(`${API_BASE}/api/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ export default function CommentSection() {
 
   const handleVote = async (id, type) => {
     try {
-      const response = await fetch(`${API_BASE}/comments/${id}/vote`, {
+      const response = await fetch(`${API_BASE}/api/comments/${id}/vote`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
