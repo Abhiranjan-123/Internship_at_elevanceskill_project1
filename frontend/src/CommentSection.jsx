@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CommentSection.module.css';
 
-const API_BASE = import.meta.env.VITE_API_BASE || "https://internship-at-elevanceskill-project1-mf58z2r0a.vercel.app/" || "http://localhost:5000/api";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://internship-at-elevanceskill-project1-1.onrender.com";
 
 export default function CommentSection() {
   // Session & Auth state
