@@ -4,56 +4,19 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-
-// Production CORS Configuration: Restricts access to your frontend environments
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://internship-at-elevanceskill-project1.vercel.app'
-    ],
-    credentials: true
+  origin: 'https://internship-at-elevanceskill-project.vercel.app', 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 app.use(express.json());
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-// Health Check Route to prevent spin-up latency and confirm operational status
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: "healthy", timestamp: new Date() });
-});
+// Auth login endpoints can remain if needed for other features, but proxy routing middleware removed from main endpoints
 
-// Authentication Verification Middleware
-async function requireAuth(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Authorization credentials absent." });
-
-    const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-
-    if (error || !user) return res.status(401).json({ error: "Session authentication expired." });
-    
-    req.user = user;
-    next();
-}
-
-// Signup Proxy (Adjusted payload to handle email confirmation flows safely)
-app.post('/api/auth/signup', async (req, res) => {
-    const { email, password } = req.body;
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return res.status(400).json({ error: error.message });
-    res.status(201).json(data);
-});
-
-// Signin Proxy
-app.post('/api/auth/signin', async (req, res) => {
-    const { email, password } = req.body;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return res.status(400).json({ error: error.message });
-    res.json({ session: data.session, user: data.user });
-});
-
-// Fetch Stream Elements (Faster due to index setup)
+// Fetch Stream Elements
 app.get('/api/comments', async (req, res) => {
     const { data, error } = await supabase
         .from('comments')
@@ -64,9 +27,9 @@ app.get('/api/comments', async (req, res) => {
     res.json(data);
 });
 
-// Submit Structured Record
-app.post('/api/comments', requireAuth, async (req, res) => {
-    const { content, detected_language } = req.body;
+// Submit Structured Record (No Authentication Required)
+app.post('/api/comments', async (req, res) => {
+    const { content, detected_language, username } = req.body;
 
     const dangerousPattern = /[<>{}\[\]\\\/]/;
     if (dangerousPattern.test(content)) {
@@ -79,8 +42,7 @@ app.post('/api/comments', requireAuth, async (req, res) => {
     const { data, error } = await supabase
         .from('comments')
         .insert([{
-            user_id: req.user.id,
-            username: req.user.email.split('@')[0],
+            username: username || "Guest",
             content,
             detected_language,
             city_name: randomCity
@@ -91,23 +53,15 @@ app.post('/api/comments', requireAuth, async (req, res) => {
     res.status(201).json(data[0]);
 });
 
-// UPGRADED: High-Speed Interaction Vote Execution Engine
-app.post('/api/comments/:id/vote', requireAuth, async (req, res) => {
+// High-Speed Interaction Vote Execution Engine (No Authentication Required)
+app.post('/api/comments/:id/vote', async (req, res) => {
     const commentId = req.params.id;
     const { type } = req.body; // 'like' or 'dislike'
     const columnTarget = type === 'like' ? 'likes' : 'dislikes';
 
     try {
-        // 1. Log unique vote log instantly. Fails immediately if they already voted.
-        const { error: voteError } = await supabase
-            .from('comment_votes')
-            .insert([{ user_id: req.user.id, comment_id: commentId, vote_type: type }]);
-
-        if (voteError) {
-            return res.status(400).json({ error: "You have already voted on this comment." });
-        }
-
-        // 2. Execute the fast atomic increment function inside the database directly
+        // Since auth is removed, we skip inserting unique records into comment_votes table
+        // and instantly trigger the increment / decrement function directly.
         const { error: rpcError } = await supabase.rpc('handle_atomic_vote', {
             target_id: commentId,
             vote_column: columnTarget
@@ -115,14 +69,14 @@ app.post('/api/comments/:id/vote', requireAuth, async (req, res) => {
 
         if (rpcError) return res.status(400).json({ error: rpcError.message });
 
-        // 3. Fetch the updated state of the comment
+        // Fetch the updated state of the comment
         const { data: updatedComment } = await supabase
             .from('comments')
             .select('*')
             .eq('id', commentId)
             .single();
 
-        // 4. Moderate if the comment reaches 2 or more dislikes
+        // Moderate if the comment reaches 2 or more dislikes
         if (type === 'dislike' && updatedComment && updatedComment.dislikes >= 2) {
             await supabase.from('comments').delete().eq('id', commentId);
             return res.json({ status: "moderated", message: "Removed due to community flags." });
