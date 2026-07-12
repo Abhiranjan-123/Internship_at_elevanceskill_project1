@@ -5,8 +5,10 @@ require('dotenv').config();
 
 const app = express();
 app.use(cors({
-  origin: 'https://internship-at-elevanceskill-project.vercel.app',
-  credentials: true
+  origin: 'https://internship-at-elevanceskill-project.vercel.app', // Aapka frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
