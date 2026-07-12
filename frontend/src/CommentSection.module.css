@@ -1,0 +1,342 @@
+:root, :root[data-theme="day"] {
+  --bg-app: #f5f7fa;
+  --bg-card: #ffffff;
+  --text-main: #000000;
+  --text-muted: #57606a;
+  --border-line: #d0d7de;
+  --shadow-depth: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --input-focus: #f8fafc;
+  --accent: #0969da;
+}
+
+:root[data-theme="night"] {
+  --bg-app: #0d1117;
+  --bg-card: #161b22;
+  --text-main: #ffffff;
+  --text-muted: #8b949e;
+  --border-line: #30363d;
+  --shadow-depth: 0 20px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --input-focus: #1f242c;
+  --accent: #58a6ff;
+}
+
+.wrapper {
+  background-color: var(--bg-app);
+  min-height: 100vh;
+  padding: 3rem 0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.container {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.themeToggle {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-line);
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.preferenceBar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-depth);
+}
+
+.prefLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.selectInput {
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-line);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.formCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  box-shadow: var(--shadow-depth);
+}
+
+.authForm h4 {
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.authInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.authActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switchAuthBtn {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.authProfile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.signOutBtn {
+  background: #cf222e;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-line);
+  box-sizing: border-box;
+  resize: vertical;
+  font-size: 1rem;
+  background: var(--bg-app);
+  color: var(--text-main);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.textarea:focus:not(:disabled) {
+  background: var(--input-focus);
+  border-color: var(--text-muted);
+}
+
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.textareaError {
+  border-color: #cf222e;
+  background: rgba(207, 34, 46, 0.05);
+}
+
+.formFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.errorMessage {
+  color: #cf222e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.submitBtn {
+  background: var(--text-main);
+  color: var(--bg-card);
+  border: 1px solid var(--border-line);
+  padding: 0.6rem 1.35rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.submitBtn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.stream {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-depth);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.author {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.location {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.content {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-main);
+  margin: 0 0 1.25rem 0;
+  word-break: break-word;
+}
+
+.translationIndicator {
+  margin-top: -0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.translationIndicator span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0969da;
+  background: rgba(9, 105, 218, 0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-line);
+  padding-top: 1.1rem;
+}
+
+.actionGroup {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.interactionBtn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-line);
+  color: var(--text-main);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.likeCounter {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.translateActionBtn {
+  background: transparent;
+  border: 1px solid var(--border-line);
+  color: var(--text-muted);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.translateActionBtn:hover {
+  border-color: var(--text-main);
+  color: var(--text-main);
+}
+
+.emptyFeed {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
