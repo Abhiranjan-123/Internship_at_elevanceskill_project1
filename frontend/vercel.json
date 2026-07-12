@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://internship-at-elevanceskill-project1.onrender.com/api/:path*"
+    }
+  ]
+}
